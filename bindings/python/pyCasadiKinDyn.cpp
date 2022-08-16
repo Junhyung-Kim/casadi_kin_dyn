@@ -35,8 +35,8 @@ PYBIND11_MODULE(CASADI_KIN_DYN_MODULE, m) {
     
     py::class_<CasadiKinDyn> casadikindyn(m, "CasadiKinDyn");
 
-    casadikindyn.def(py::init<std::string>())
-            .def(py::init<std::string>())
+    casadikindyn.def(py::init<pinocchio::Model>())
+            .def(py::init<pinocchio::Model>())
             .def("nq", &CasadiKinDyn::nq)
             .def("nv", &CasadiKinDyn::nv)
             .def("q_min", &CasadiKinDyn::q_min)
