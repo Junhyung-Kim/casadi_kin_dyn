@@ -5,6 +5,22 @@
 #include <memory>
 #include <vector>
 
+
+#define PINOCCHIO_URDFDOM_TYPEDEF_SHARED_PTR
+#include <pinocchio/parsers/urdf.hpp>
+#include <pinocchio/algorithm/contact-dynamics.hpp>
+#include <pinocchio/algorithm/frames.hpp>
+#include <pinocchio/algorithm/rnea.hpp>
+#include <pinocchio/algorithm/contact-dynamics.hpp>
+#include <pinocchio/algorithm/centroidal.hpp>
+#include <pinocchio/algorithm/crba.hpp>
+#include <pinocchio/algorithm/jacobian.hpp>
+#include <pinocchio/algorithm/energy.hpp>
+#include <pinocchio/autodiff/casadi.hpp>
+#include <pinocchio/algorithm/aba.hpp>
+
+#include <urdf_parser/urdf_parser.h>
+
 namespace casadi_kin_dyn {
 
 class CasadiKinDyn
@@ -18,7 +34,7 @@ public:
       LOCAL_WORLD_ALIGNED = 2 //This is classical in world frame
     };
 
-    CasadiKinDyn(std::string urdf_string);
+    CasadiKinDyn(pinocchio::Model model);
 
     int nq() const;
     int nv() const;

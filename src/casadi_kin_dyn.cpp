@@ -2,22 +2,7 @@
 
 #include <casadi/casadi.hpp>
 
-#define PINOCCHIO_URDFDOM_TYPEDEF_SHARED_PTR
-#include <pinocchio/parsers/urdf.hpp>
-#include <pinocchio/algorithm/contact-dynamics.hpp>
-#include <pinocchio/algorithm/frames.hpp>
-#include <pinocchio/algorithm/rnea.hpp>
-#include <pinocchio/algorithm/contact-dynamics.hpp>
-#include <pinocchio/algorithm/centroidal.hpp>
-#include <pinocchio/algorithm/crba.hpp>
-#include <pinocchio/algorithm/jacobian.hpp>
-#include <pinocchio/algorithm/energy.hpp>
-#include <pinocchio/autodiff/casadi.hpp>
-#include <pinocchio/algorithm/aba.hpp>
-
 #include <urdf_parser/urdf_parser.h>
-
-
 
 namespace casadi_kin_dyn
 {
@@ -27,7 +12,7 @@ class CasadiKinDyn::Impl
 
 public:
 
-    Impl(urdf::ModelInterfaceSharedPtr urdf_model);
+    Impl(pinocchio::Model model);
 
     int nq() const;
     int nv() const;
@@ -78,9 +63,22 @@ private:
 
 };
 
-CasadiKinDyn::Impl::Impl(urdf::ModelInterfaceSharedPtr urdf_model)
+CasadiKinDyn::Impl::Impl(pinocchio::Model model)
 {
-    pinocchio::urdf::buildModel(urdf_model, _model_dbl, true); // verbose
+    _model_dbl = model;
+    /*pinocchio::urdf::buildModel(urdf_model, _model_dbl, false); // verbose
+    pinocchio::JointIndex RFjoint_id = _model_dbl.getJointId("R_AnkleRoll_Joint");
+    pinocchio::JointIndex LFjoint_id = _model_dbl.getJointId("L_AnkleRoll_Joint");
+    int LFframe_id = _model_dbl.getFrameId("L_Foot_Link");
+    int RFframe_id = _model_dbl.getFrameId("R_Foot_Link");
+    pinocchio::SE3 frame_pos;
+    Eigen::Matrix3d I3;
+    I3.setIdentity();    
+    frame_pos.rotation() = I3;
+    frame_pos.translation() << 0.03, 0, -0.1585;
+    _model_dbl.addBodyFrame("LF_contact", LFjoint_id, frame_pos, LFframe_id);
+    _model_dbl.addBodyFrame("RF_contact", RFjoint_id, frame_pos, RFframe_id);*/
+    std::cout << _model_dbl.nq << std::endl;
     _q = casadi::SX::sym("q", _model_dbl.nq);
     _qdot = casadi::SX::sym("v", _model_dbl.nv);
     _qddot = casadi::SX::sym("a", _model_dbl.nv);
@@ -439,10 +437,10 @@ casadi::SX CasadiKinDyn::Impl::eigmat_to_cas(const CasadiKinDyn::Impl::MatrixXs 
 
 }
 
-CasadiKinDyn::CasadiKinDyn(std::string urdf_string)
+CasadiKinDyn::CasadiKinDyn(pinocchio::Model model)
 {
-    auto urdf = urdf::parseURDF(urdf_string);
-    _impl.reset(new Impl(urdf));
+    auto model_ = model;//urdf::parseURDF(urdf_string);
+    _impl.reset(new Impl(model_));
 }
 
 int CasadiKinDyn::nq() const
